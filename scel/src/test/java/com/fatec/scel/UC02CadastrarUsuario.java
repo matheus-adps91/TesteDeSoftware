@@ -1,115 +1,31 @@
 package com.fatec.scel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import com.fatec.scel.model.PapelDoUsuario;
 import com.fatec.scel.model.Usuario;
+import com.fatec.scel.model.UsuarioRepository;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(SpringRunner.class)
+@DataJpaTest
 public class UC02CadastrarUsuario {
-	
-	@Test
-	public void CT01CadastrarUsuarioComDadosValidos() {
-		try {
-			//cenario
-			Usuario umUsuario = new Usuario();
-			//acao
-			umUsuario.setRa("123456");
-			umUsuario.setNome("Ana");
-		} catch (RuntimeException e) {
-			//verificacao
-			fail("nao deve falhar");
-		}
-	}
-	
-	@Test
-	public void CT02CadastrarUsuarioComDadosInvalidos() {
-		try {
-			//cenario
-			Usuario umUsuario = new Usuario();
-			//acao
-			umUsuario.setRa("");
-			umUsuario.setNome("Ana");
-		} catch (RuntimeException e) {
-			//verificacao
-			assertEquals("RA invalido", e.getMessage());
-		}
-	}
-	
-	@Test
-	public void CT03CadastrarUsuarioComDadosInvalidos() {
-		try {
-			//cenario
-			Usuario umUsuario = new Usuario();
-			//acao
-			umUsuario.setRa(null);
-			umUsuario.setNome("Ana");
-		} catch (RuntimeException e) {
-			//verificacao
-			assertEquals("RA invalido", e.getMessage());
-		}
-	}
-	
-	@Test
-	public void CT04CadastrarUsuarioComDadosInvalidos() {
-		try {
-			//cenario
-			Usuario umUsuario = new Usuario();
-			//acao
-			umUsuario.setRa("123456");
-			umUsuario.setNome("");
-		} catch (RuntimeException e) {
-			//verificacao
-			assertEquals("Nome invalido", e.getMessage());
-		}
-	}
-	
-	@Test
-	public void CT05CadastrarUsuarioComDadosInvalidos() {
-		try {
-			//cenario
-			Usuario umUsuario = new Usuario();
-			//acao
-			umUsuario.setRa("123456");
-			umUsuario.setNome(null);
-		} catch (RuntimeException e) {
-			//verificacao
-			assertEquals("Nome invalido", e.getMessage());
-		}
-	}
-	
-	@Test
-	public void CT08Verifica_obtem_ra() {
-		
-		//cenario
-		Usuario umUsuario = new Usuario();
-		try {
-			//acao
-			umUsuario.setRa("123456");
-			umUsuario.setNome("Ana");
-		} catch (RuntimeException e) {
-			//verificacao
-			fail("nao deve falhar");			
-		}
-		assertEquals("123456", umUsuario.getRa());
-	}
-	
-	@Test
-	public void CT09Verifica_obtem_nome() {
-		
-		//cenario
-		Usuario umUsuario = new Usuario();
-		try {
-			//acao
-			umUsuario.setRa("123456");
-			umUsuario.setNome("Ana");
-		} catch (RuntimeException e) {
-			//verificacao
-			fail("nao deve falhar");			
-		}
-		assertEquals("Ana", umUsuario.getNome());
-	}
-	
+	@Autowired
+	private UsuarioRepository repository;
 
+	@Test
+	public void testStoreUser() {
+		HashSet<PapelDoUsuario> papel = new HashSet<>();
+		papel.add(PapelDoUsuario.PROFESSOR);
+		Usuario usuario = new Usuario(UUID.randomUUID(), "prof.edsonalmeida@fatec.sp.br", "pwd", papel);
+		repository.save(usuario);
+		Iterable<Usuario> usuarios = repository.findAll();
+		assertThat(usuarios).hasSize(1);
+	}
 }
